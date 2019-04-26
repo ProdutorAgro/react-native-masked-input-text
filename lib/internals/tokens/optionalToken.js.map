@@ -1,0 +1,1 @@
+{"version":3,"file":"optionalToken.js","sourceRoot":"","sources":["../../../internals/tokens/optionalToken.ts"],"names":[],"mappings":"AAAA,OAAO,cAAc,MAAM,kBAAkB,CAAC;AAE9C,MAAM,CAAC,OAAO,OAAO,aAAc,SAAQ,cAAc;IACjD,QAAQ;QACd,OAAO,IAAI,IAAI,CAAC,UAAU,CAAC,QAAQ,EAAE,IAAI,CAAC;IAC3C,CAAC;CACD"}
