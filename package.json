@@ -1,6 +1,6 @@
 {
   "name": "react-native-masked-input-text",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A typescript masked InputText for react-native",
   "main": "index.tsx",
   "repository": "git@github.com:ProdutorAgro/react-native-masked-input-text.git",
@@ -14,6 +14,7 @@
     "react": "^16.8.6",
     "react-native": "^0.59.5"
   },
+  "keywords": ["react-native", "mask", "input"],
   "devDependencies": {
     "@babel/core": "^7.4.4",
     "@babel/plugin-proposal-class-properties": "^7.4.4",
