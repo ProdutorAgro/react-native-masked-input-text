@@ -10,7 +10,7 @@
     "build": "jest && tsc --p tsconfig.json",
     "test": "jest --coverage"
   },
-  "dependencies": {
+  "peerDependencies": {
     "react": "^16.8.6",
     "react-native": "^0.59.5"
   },
