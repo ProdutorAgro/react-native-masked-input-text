@@ -1,0 +1,17 @@
+{
+  "name": "react-native-masked-input",
+  "version": "1.0.0",
+  "description": "A typescript masked input for react-native",
+  "main": "index.tsx",
+  "repository": "git@github.com:ProdutorAgro/react-native-masked-input.git",
+  "author": "Matheus Nogueira <matheus.nogueira@produtoragro.com.br>",
+  "license": "MIT",
+  "dependencies": {
+    "react": "^16.8.6",
+    "react-native": "^0.59.5"
+  },
+  "devDependencies": {
+    "@types/react": "^16.8.14",
+    "@types/react-native": "^0.57.50"
+  }
+}
