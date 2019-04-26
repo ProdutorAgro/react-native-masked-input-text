@@ -6,6 +6,9 @@
   "repository": "git@github.com:ProdutorAgro/react-native-masked-input.git",
   "author": "Matheus Nogueira <matheus.nogueira@produtoragro.com.br>",
   "license": "MIT",
+  "scripts": {
+    "build": "tsc --p tsconfig.json --outDir lib/"
+  },
   "dependencies": {
     "react": "^16.8.6",
     "react-native": "^0.59.5"

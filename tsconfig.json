@@ -1,0 +1,28 @@
+{
+	"compilerOptions": {
+		"baseUrl": ".",
+		"paths": { "*": ["types/*"] },
+		"allowSyntheticDefaultImports": true,
+		"declaration": false,
+		"emitDecoratorMetadata": true,
+		"experimentalDecorators": true,
+		"lib": [
+			"dom",
+			"es6",
+			"es2017"
+		],
+		"noImplicitAny": true,
+		"noImplicitThis": true,
+		"target": "ES6",
+		"module": "ES6",
+		"jsx": "react",
+		"sourceMap": true,
+		"outDir": "./build",
+		"moduleResolution": "node",
+		"skipLibCheck": true
+	},
+	"include": [
+		"./index.tsx",
+		"./internals/**/*.ts"
+	]
+}
