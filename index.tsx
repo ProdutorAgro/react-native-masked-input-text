@@ -41,7 +41,9 @@ export default class MaskedInput extends Component<IMaskedInputProps, IMaskedInp
 	private updateMaskedValue(inputValue: string): void {
 		const newValue = this.userInputProcessorFunction(inputValue, UserInputType.INSERTION);
 		this.setState({value: newValue});
-		this.props.onTextChange(newValue);
+		if (this.props.onTextChange) {
+			this.props.onTextChange(newValue);
+		}
 	}
 
 	public render(): ReactNode {
