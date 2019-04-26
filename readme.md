@@ -1,5 +1,5 @@
 # Masked InputText for React Native
-[![npm version](https://badge.fury.io/js/react-native-masked-input-text.svg)](https://badge.fury.io/js/react-native-masked-input-text)
+[![npm version](https://img.shields.io/npm/v/react-native-masked-input-text.svg)](https://img.shields.io/npm/v/react-native-masked-input-text.svg)
 ## Install
 NPM
 ```
