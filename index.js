@@ -317,7 +317,9 @@ define("index", ["require", "exports", "react", "react", "react-native", "intern
         updateMaskedValue(inputValue) {
             const newValue = this.userInputProcessorFunction(inputValue, inputProcessor_1.UserInputType.INSERTION);
             this.setState({ value: newValue });
-            this.props.onTextChange(newValue);
+            if (this.props.onTextChange) {
+                this.props.onTextChange(newValue);
+            }
         }
         render() {
             return (React.createElement(react_native_1.TextInput, { value: this.state.value, placeholder: this.props.placeholder, placeholderTextColor: this.props.placeholderTextColor, onChangeText: (text) => this.onTextChange(text), style: this.props.style, onSubmitEditing: this.props.onSubmitEditing, keyboardType: this.props.keyboardType }));
