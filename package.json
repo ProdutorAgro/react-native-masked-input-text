@@ -7,7 +7,7 @@
   "author": "Matheus Nogueira <matheus.nogueira@produtoragro.com.br>",
   "license": "MIT",
   "scripts": {
-    "build": "tsc --p tsconfig.json --outDir lib/",
+    "build": "tsc --p tsconfig.json",
     "test": "jest --coverage"
   },
   "dependencies": {
