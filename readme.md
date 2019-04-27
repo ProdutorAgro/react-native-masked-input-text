@@ -1,5 +1,5 @@
 # Masked InputText for React Native
-[![npm version](https://img.shields.io/npm/v/react-native-masked-input-text.svg)](https://img.shields.io/npm/v/react-native-masked-input-text.svg)
+[![npm version](https://img.shields.io/npm/v/react-native-masked-input-text.svg)](https://www.npmjs.com/package/react-native-masked-input-text)
 ## Install
 NPM
 ```
