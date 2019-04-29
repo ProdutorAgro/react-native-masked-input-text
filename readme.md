@@ -1,4 +1,6 @@
 # Masked InputText for React Native
+[![Build Status](https://travis-ci.org/ProdutorAgro/react-native-masked-input-text.svg?branch=master)](https://travis-ci.org/ProdutorAgro/react-native-masked-input-text)
+[![Coverage Status](https://coveralls.io/repos/github/ProdutorAgro/react-native-masked-input-text/badge.svg?branch=master)](https://coveralls.io/github/ProdutorAgro/react-native-masked-input-text?branch=master)
 [![npm version](https://img.shields.io/npm/v/react-native-masked-input-text.svg)](https://www.npmjs.com/package/react-native-masked-input-text)
 ## Install
 NPM

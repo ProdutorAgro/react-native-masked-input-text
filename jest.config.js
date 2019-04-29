@@ -9,7 +9,6 @@ module.exports = {
     "ts",
     "tsx"
   ],
-  "preset": "react-native",
   "transform": {
     "^.+\\.ts?$": "babel-jest",
     "^.+\\.ts$": "<rootDir>/node_modules/react-native/jest/preprocessor.js"
