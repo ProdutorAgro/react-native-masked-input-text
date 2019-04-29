@@ -164,7 +164,25 @@ define("internals/maskRegexCreator", ["require", "exports", "internals/tokens/li
     }
     exports.createMaskRegex = createMaskRegex;
 });
-define("internals/inputProcessor", ["require", "exports", "internals/maskTokenizer", "internals/maskRegexCreator"], function (require, exports, maskTokenizer_1, maskRegexCreator_1) {
+define("internals/maskedTextResultFactory", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    class MaskedTextResultFactory {
+        constructor(tokensRegex) {
+            this.completenessRegex = tokensRegex.reduce((maskRegex, tokenRegex) => maskRegex + tokenRegex.regex, '');
+        }
+        create(text) {
+            const x = text.match(this.completenessRegex);
+            const isComplete = !!x;
+            return {
+                text,
+                complete: isComplete
+            };
+        }
+    }
+    exports.default = MaskedTextResultFactory;
+});
+define("internals/inputProcessor", ["require", "exports", "internals/maskTokenizer", "internals/maskRegexCreator", "internals/maskedTextResultFactory"], function (require, exports, maskTokenizer_1, maskRegexCreator_1, maskedTextResultFactory_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var UserInputType;
@@ -175,6 +193,7 @@ define("internals/inputProcessor", ["require", "exports", "internals/maskTokeniz
     function createInputProcessor(mask) {
         const tokens = maskTokenizer_1.getTokens(mask);
         const regexes = createTokenRegexes(tokens);
+        const maskTextResultFactory = new maskedTextResultFactory_1.default(regexes);
         const inputProcessorOptions = {
             regexes
         };
@@ -189,10 +208,11 @@ define("internals/inputProcessor", ["require", "exports", "internals/maskTokeniz
                 numberTokensConsumed += appliedMask.numberConsumedTokens;
                 lastIterationValue = appliedMask.text;
                 if (!appliedMask.valid) {
-                    return appliedMask.text;
+                    return maskTextResultFactory.create(appliedMask.text);
                 }
             }
-            return appliedMask ? appliedMask.text : '';
+            const text = appliedMask ? appliedMask.text : '';
+            return maskTextResultFactory.create(text);
         };
     }
     exports.createInputProcessor = createInputProcessor;
@@ -315,10 +335,10 @@ define("index", ["require", "exports", "react", "react", "react-native", "intern
             this.updateMaskedValue(this.state.value);
         }
         updateMaskedValue(inputValue) {
-            const newValue = this.userInputProcessorFunction(inputValue, inputProcessor_1.UserInputType.INSERTION);
-            this.setState({ value: newValue });
+            const maskResult = this.userInputProcessorFunction(inputValue, inputProcessor_1.UserInputType.INSERTION);
+            this.setState({ value: maskResult.text });
             if (this.props.onTextChange) {
-                this.props.onTextChange(newValue);
+                this.props.onTextChange(maskResult.text, maskResult.complete);
             }
         }
         render() {
@@ -326,309 +346,5 @@ define("index", ["require", "exports", "react", "react", "react-native", "intern
         }
     }
     exports.default = MaskedInput;
-});
-define("internals/inputProcessorTest", ["require", "exports", "internals/inputProcessor"], function (require, exports, inputProcessor_2) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    test('Process a simple numeric mask', () => {
-        const inputProcessor = inputProcessor_2.createInputProcessor('00000 0000');
-        const inputKeys = ['0', '1', '2', '3', '4', ' ', '5', '6', '7', '8'];
-        const expectedOutputs = ['0', '01', '012', '0123', '01234', '01234 ', '01234 5', '01234 56', '01234 567', '01234 5678'];
-        const outputValues = pressKeysOneAtTime(inputKeys, inputProcessor);
-        expect(outputValues).toEqual(expectedOutputs);
-    });
-    test('Process a mask autocompleting a literal value if it is not optional', () => {
-        const inputProcessor = inputProcessor_2.createInputProcessor('\\90000 0000');
-        const inputKeys = ['0', '1', '2', '3', '5', '6', '7', '8'];
-        const expectedOutputs = ['90', '901', '9012', '90123', '90123 5', '90123 56', '90123 567', '90123 5678'];
-        const outputValues = pressKeysOneAtTime(inputKeys, inputProcessor);
-        expect(outputValues).toEqual(expectedOutputs);
-    });
-    test('Process a mask with optional values setting the optional value', () => {
-        const inputProcessor = inputProcessor_2.createInputProcessor('00000? 0000');
-        const inputKeys = ['0', '1', '2', '3', '4', ' ', '5', '6', '7', '8'];
-        const expectedOutputs = ['0', '01', '012', '0123', '01234', '01234 ', '01234 5', '01234 56', '01234 567', '01234 5678'];
-        const outputValues = pressKeysOneAtTime(inputKeys, inputProcessor);
-        expect(outputValues).toEqual(expectedOutputs);
-    });
-    test('Process a mask with optional values without setting the optional value', () => {
-        const inputProcessor = inputProcessor_2.createInputProcessor('\\9?0000 0000');
-        const inputKeys = ['0', '1', '2', '5', '5', '6', '7', '8'];
-        const expectedOutputs = ['0', '01', '012', '0125', '0125 5', '0125 56', '0125 567', '0125 5678'];
-        const outputValues = pressKeysOneAtTime(inputKeys, inputProcessor);
-        expect(outputValues).toEqual(expectedOutputs);
-    });
-    test('Process a mask that starts with a literal value and user doesnt fill it up', () => {
-        const inputProcessor = inputProcessor_2.createInputProcessor('+55 00');
-        const inputKeys = ['1', '1'];
-        const expectedOutputs = ['+55 1', '+55 11'];
-        const outputValues = pressKeysOneAtTime(inputKeys, inputProcessor);
-        expect(outputValues).toEqual(expectedOutputs);
-    });
-    test('Skip optional literal after autocompletable token if input doesnt match', () => {
-        const inputProcessor = inputProcessor_2.createInputProcessor('+55 00 9?0000-0000');
-        const inputKeys = ['1', '2', '3'];
-        const outputValues = pressKeysOneAtTime(inputKeys, inputProcessor);
-        expect(outputValues).toEqual(['+55 1', '+55 12', '+55 12 3']);
-    });
-    test('Go back to previous value if input is bigger than number of tokens', () => {
-        const inputProcessor = inputProcessor_2.createInputProcessor('+55 00 9?0000-0000');
-        const inputKeys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1'];
-        const outputValues = pressKeysOneAtTime(inputKeys, inputProcessor);
-        expect(outputValues).toEqual([
-            '+55 1', '+55 12', '+55 12 3', '+55 12 34', '+55 12 345', '+55 12 3456', '+55 12 3456-7', '+55 12 3456-78', '+55 12 3456-789', '+55 12 3456-7890', '+55 12 3456-7890'
-        ]);
-    });
-    test('Mask with dots', () => {
-        const inputProcessor = inputProcessor_2.createInputProcessor('00.0-0');
-        const inputKeys = ['1', '2', '3', '4'];
-        const outputValues = pressKeysOneAtTime(inputKeys, inputProcessor);
-        const expectedOutputs = ['1', '12', '12.3', '12.3-4'];
-        expect(outputValues).toEqual(expectedOutputs);
-    });
-    test('Mask with fast input of invalid symbols', () => {
-        const inputProcessor = inputProcessor_2.createInputProcessor('0000');
-        const inputKeys = ['ha', '0', 'h'];
-        const outputValues = pressKeysOneAtTime(inputKeys, inputProcessor);
-        expect(outputValues).toEqual(['', '0', '0']);
-    });
-    test('Mask with full value pasted', () => {
-        const inputProcessor = inputProcessor_2.createInputProcessor('+55 9 0000 0000');
-        const inputKeys = ['12345678'];
-        const outputValues = pressKeysOneAtTime(inputKeys, inputProcessor);
-        expect(outputValues).toEqual(['+55 9 1234 5678']);
-    });
-    test('Edit wrong value in middle of masked value', () => {
-        const inputProcessor = inputProcessor_2.createInputProcessor('+55 (00) 9 0000 0000');
-        const inputValues = ['+55 (12) 9 12345 678'];
-        const outputValues = enterValuesOneAtTime(inputValues, inputProcessor);
-        expect(outputValues).toEqual(['+55 (12) 9 1234 5678']);
-    });
-    test('Change mask on the fly and value is bigger than mask', () => {
-        const inputProcessor = inputProcessor_2.createInputProcessor('+595 00 0000000');
-        const inputValues = ['+55 (11) 9 8765-4321'];
-        const outputValues = enterValuesOneAtTime(inputValues, inputProcessor);
-        expect(outputValues).toEqual(['+595 11 9876543']);
-    });
-    function pressKeysOneAtTime(keys, inputProcessor) {
-        let currentValue = '';
-        const outputValues = [];
-        for (const key of keys) {
-            const currentInput = currentValue + key;
-            currentValue = inputProcessor(currentInput, inputProcessor_2.UserInputType.INSERTION);
-            outputValues.push(currentValue);
-        }
-        return outputValues;
-    }
-    function enterValuesOneAtTime(values, inputProcessor) {
-        return values.map((value) => inputProcessor(value, inputProcessor_2.UserInputType.INSERTION));
-    }
-});
-define("internals/maskRegexCreatorTest", ["require", "exports", "internals/maskRegexCreator", "internals/maskTokenizer"], function (require, exports, maskRegexCreator_2, maskTokenizer_2) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    test('Create regex for simple mask', () => {
-        const tokens = maskTokenizer_2.getTokens('0000 0000');
-        const regex = maskRegexCreator_2.createMaskRegex(tokens);
-        const validInputs = [
-            '1234 5678',
-            '9876 5432'
-        ];
-        const invalidInputs = [
-            '123a 4567',
-            '12345678'
-        ];
-        testRegex(regex, validInputs, invalidInputs);
-    });
-    test('Create regex for mask with literal values', () => {
-        const tokens = maskTokenizer_2.getTokens('+\\0\\0 0000 0000');
-        const regex = maskRegexCreator_2.createMaskRegex(tokens);
-        const validInputs = [
-            '+00 1234 5678',
-            '+00 9876 5432'
-        ];
-        const invalidInputs = [
-            '+99 1234 4567',
-            '+aa 12345678',
-            '1234 5678'
-        ];
-        testRegex(regex, validInputs, invalidInputs);
-    });
-    test('Create regex for mask with optional values', () => {
-        const tokens = maskTokenizer_2.getTokens('+00 00000? 0000');
-        const regex = maskRegexCreator_2.createMaskRegex(tokens);
-        const validInputs = [
-            '+55 1234 5678',
-            '+88 98760 5432'
-        ];
-        const invalidInputs = [
-            '+99 1234a 4567',
-            '+00 12345678',
-            '+13 123a 5678'
-        ];
-        testRegex(regex, validInputs, invalidInputs);
-    });
-    test('Create regex for mask with optional literal values', () => {
-        const tokens = maskTokenizer_2.getTokens('+00 ?\\9? 0000 0000');
-        const regex = maskRegexCreator_2.createMaskRegex(tokens);
-        const validInputs = [
-            '+55 9 1234 5678',
-            '+88 8760 5432'
-        ];
-        const invalidInputs = [
-            '+99 8 1234a 4567',
-            '+00 a 12345678',
-            '+13  9 123a 5678'
-        ];
-        testRegex(regex, validInputs, invalidInputs);
-    });
-    test('Create regex for mask containing literal question mark', () => {
-        const tokens = maskTokenizer_2.getTokens('+55\\?0');
-        const regex = maskRegexCreator_2.createMaskRegex(tokens);
-        const validInputs = [
-            '+55?3',
-            '+55?0'
-        ];
-        const invalidInputs = [
-            '+553',
-            '+53'
-        ];
-        testRegex(regex, validInputs, invalidInputs);
-    });
-    test('Create regex with multiple wildcards', () => {
-        const tokens = maskTokenizer_2.getTokens('XX-xas000/1000');
-        const regex = maskRegexCreator_2.createMaskRegex(tokens);
-        const validInputs = [
-            'MG-abb123/1987',
-            'SP-dBv321/1234',
-            'RJ-k8s654/1875',
-            'GO-l7P127/1458'
-        ];
-        const invalidInputs = [
-            '01-abc123/1987',
-            'SP-XBv321/1234',
-            'RJ-k7s654/2875',
-            'GO-l70127/1458'
-        ];
-        testRegex(regex, validInputs, invalidInputs);
-    });
-    function testRegex(regex, validInputs, invalidInputs) {
-        for (const validInput of validInputs) {
-            expect(validInput.match(regex)).toBeTruthy();
-        }
-        for (const invalidInput of invalidInputs) {
-            expect(invalidInput.match(regex)).toBeFalsy();
-        }
-    }
-});
-define("internals/maskTokenizerTest", ["require", "exports", "internals/maskTokenizer"], function (require, exports, maskTokenizer_3) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    function createToken(token, optional = false, literal = false) {
-        return {
-            token,
-            optional,
-            literal
-        };
-    }
-    test('Tokenize simple mask', () => {
-        const tokens = maskTokenizer_3.getTokens('0000-0000');
-        expect(tokens).toEqual([
-            createToken('0'),
-            createToken('0'),
-            createToken('0'),
-            createToken('0'),
-            createToken('-', false, true),
-            createToken('0'),
-            createToken('0'),
-            createToken('0'),
-            createToken('0')
-        ]);
-    });
-    test('Tokenize mask with escaped chars', () => {
-        const tokens = maskTokenizer_3.getTokens('+\\5\\5 0000-0000');
-        expect(tokens).toEqual([
-            createToken('+', false, true),
-            createToken('5', false, true),
-            createToken('5', false, true),
-            createToken(' ', false, true),
-            createToken('0'),
-            createToken('0'),
-            createToken('0'),
-            createToken('0'),
-            createToken('-', false, true),
-            createToken('0'),
-            createToken('0'),
-            createToken('0'),
-            createToken('0')
-        ]);
-    });
-    test('Tokenize mask with optional chars', () => {
-        const tokens = maskTokenizer_3.getTokens('0?0000 0000');
-        expect(tokens).toEqual([
-            createToken('0', true),
-            createToken('0'),
-            createToken('0'),
-            createToken('0'),
-            createToken('0'),
-            createToken(' ', false, true),
-            createToken('0'),
-            createToken('0'),
-            createToken('0'),
-            createToken('0')
-        ]);
-    });
-    test('Tokenize mask with a literal character that is also optional', () => {
-        const tokens = maskTokenizer_3.getTokens('\\9? 0000-0000');
-        expect(tokens).toEqual([
-            createToken('9', true, true),
-            createToken(' ', false, true),
-            createToken('0'),
-            createToken('0'),
-            createToken('0'),
-            createToken('0'),
-            createToken('-', false, true),
-            createToken('0'),
-            createToken('0'),
-            createToken('0'),
-            createToken('0'),
-        ]);
-    });
-    test('Tokenize mask with implicit literal character', () => {
-        const tokens = maskTokenizer_3.getTokens('0000 0000');
-        expect(tokens).toEqual([
-            createToken('0'),
-            createToken('0'),
-            createToken('0'),
-            createToken('0'),
-            createToken(' ', false, true),
-            createToken('0'),
-            createToken('0'),
-            createToken('0'),
-            createToken('0'),
-        ]);
-    });
-    test('Tokenize optional implicit literal', () => {
-        const tokens = maskTokenizer_3.getTokens('+55 9?0.0');
-        expect(tokens).toEqual([
-            createToken('+', false, true),
-            createToken('5', false, true),
-            createToken('5', false, true),
-            createToken(' ', false, true),
-            createToken('9', true, true),
-            createToken('0', false, false),
-            createToken('.', false, true),
-            createToken('0', false, false)
-        ]);
-    });
-    test('Tokenize literal question mark token', () => {
-        const tokens = maskTokenizer_3.getTokens('+55\\?');
-        expect(tokens).toEqual([
-            createToken('+', false, true),
-            createToken('5', false, true),
-            createToken('5', false, true),
-            createToken('?', false, true),
-        ]);
-    });
 });
 //# sourceMappingURL=index.js.map

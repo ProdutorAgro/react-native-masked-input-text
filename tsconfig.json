@@ -25,5 +25,8 @@
 	"include": [
 		"./index.tsx",
 		"./internals/**/*.ts"
+	],
+	"exclude": [
+		"./internals/*Test.ts"
 	]
 }

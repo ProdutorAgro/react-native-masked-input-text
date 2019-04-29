@@ -1,17 +1,11 @@
 import { getTokens } from './maskTokenizer';
 import { createRegexFromToken } from './maskRegexCreator';
-import { IMaskToken } from './types';
+import { IMaskedTextResult, IMaskToken, ITokenRegex } from './types';
+import MaskedTextResultFactory from './maskedTextResultFactory';
 
 export enum UserInputType {
 	INSERTION,
 	DELETION
-}
-
-interface ITokenRegex {
-	text: string;
-	regex: string;
-	literal: boolean;
-	optional: boolean;
 }
 
 interface InputProcessorOptions {
@@ -30,16 +24,17 @@ interface IAutoCompleteResult {
 	inputWasIgnored: boolean;
 }
 
-export type InputProcessorFunction = (value: string, inputType: UserInputType) => string;
+export type InputProcessorFunction = (value: string, inputType: UserInputType) => IMaskedTextResult;
 
 export function createInputProcessor(mask: string): InputProcessorFunction {
 	const tokens = getTokens(mask);
 	const regexes = createTokenRegexes(tokens);
+	const maskTextResultFactory = new MaskedTextResultFactory(regexes);
 	const inputProcessorOptions = {
 		regexes
 	};
 
-	return (value: string, inputType: UserInputType): string => {
+	return (value: string, inputType: UserInputType): IMaskedTextResult => {
 		let appliedMask: IMaskResult;
 		let numberTokensConsumed = 0;
 		let lastIterationValue = '';
@@ -50,11 +45,12 @@ export function createInputProcessor(mask: string): InputProcessorFunction {
 			numberTokensConsumed += appliedMask.numberConsumedTokens;
 			lastIterationValue = appliedMask.text;
 			if (!appliedMask.valid) {
-				return appliedMask.text;
+				return maskTextResultFactory.create(appliedMask.text);
 			}
 		}
 
-		return appliedMask ? appliedMask.text : '';
+		const text = appliedMask ? appliedMask.text : '';
+		return maskTextResultFactory.create(text);
 	};
 }
 

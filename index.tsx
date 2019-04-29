@@ -9,7 +9,7 @@ interface IMaskedInputProps {
 	style?: object;
 	value?: string;
 	keyboardType?: KeyboardTypeOptions;
-	onTextChange?: ((text: string) => void);
+	onTextChange?: ((text: string, complete: boolean) => void);
 	placeholderTextColor?: string;
 	onSubmitEditing?: (() => void);
 }
@@ -39,10 +39,10 @@ export default class MaskedInput extends Component<IMaskedInputProps, IMaskedInp
 	}
 
 	private updateMaskedValue(inputValue: string): void {
-		const newValue = this.userInputProcessorFunction(inputValue, UserInputType.INSERTION);
-		this.setState({value: newValue});
+		const maskResult = this.userInputProcessorFunction(inputValue, UserInputType.INSERTION);
+		this.setState({value: maskResult.text});
 		if (this.props.onTextChange) {
-			this.props.onTextChange(newValue);
+			this.props.onTextChange(maskResult.text, maskResult.complete);
 		}
 	}
 
