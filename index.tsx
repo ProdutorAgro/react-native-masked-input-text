@@ -3,13 +3,15 @@ import { Component, ReactNode } from 'react';
 import { KeyboardTypeOptions, TextInput } from 'react-native';
 import { createInputProcessor, InputProcessorFunction, UserInputType } from './internals/inputProcessor';
 
+type OnTextChangeListener = ((text: string, complete: boolean) => void);
+
 interface IMaskedInputProps {
 	mask: string;
 	placeholder: string;
 	style?: object;
 	value?: string;
 	keyboardType?: KeyboardTypeOptions;
-	onTextChange?: ((text: string, complete: boolean) => void);
+	onTextChange?: OnTextChangeListener;
 	placeholderTextColor?: string;
 	onSubmitEditing?: (() => void);
 }

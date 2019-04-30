@@ -1,13 +1,15 @@
 import { KeyboardTypeOptions } from 'react-native';
 import { Component } from 'react';
 
+type OnTextChangeListener = ((text: string, complete: boolean) => void);
+
 interface IMaskedInputProps {
 	mask: string;
 	placeholder: string;
 	style?: object;
 	value?: string;
 	keyboardType?: KeyboardTypeOptions;
-	onTextChange?: ((text: string) => void);
+	onTextChange?: OnTextChangeListener;
 	placeholderTextColor?: string;
 	onSubmitEditing?: (() => void);
 }
