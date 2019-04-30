@@ -37,13 +37,16 @@ export default class MaskedInput extends Component<IMaskedInputProps, IMaskedInp
 
 	public componentWillReceiveProps(nextProps: Readonly<IMaskedInputProps>, nextContext: any): void {
 		this.userInputProcessorFunction = createInputProcessor(nextProps.mask);
-		this.updateMaskedValue(this.state.value);
+		this.updateMaskedValue(nextProps.value);
 	}
 
 	private updateMaskedValue(inputValue: string): void {
 		const maskResult = this.userInputProcessorFunction(inputValue, UserInputType.INSERTION);
-		this.setState({value: maskResult.text});
-		if (this.props.onTextChange) {
+		const previousValue = this.state.value;
+		const currentValue = maskResult.text;
+
+		this.setState({ value: currentValue });
+		if (this.props.onTextChange && currentValue !== previousValue) {
 			this.props.onTextChange(maskResult.text, maskResult.complete);
 		}
 	}
