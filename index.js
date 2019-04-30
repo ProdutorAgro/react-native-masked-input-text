@@ -332,12 +332,14 @@ define("index", ["require", "exports", "react", "react", "react-native", "intern
         }
         componentWillReceiveProps(nextProps, nextContext) {
             this.userInputProcessorFunction = inputProcessor_1.createInputProcessor(nextProps.mask);
-            this.updateMaskedValue(this.state.value);
+            this.updateMaskedValue(nextProps.value);
         }
         updateMaskedValue(inputValue) {
             const maskResult = this.userInputProcessorFunction(inputValue, inputProcessor_1.UserInputType.INSERTION);
-            this.setState({ value: maskResult.text });
-            if (this.props.onTextChange) {
+            const previousValue = this.state.value;
+            const currentValue = maskResult.text;
+            this.setState({ value: currentValue });
+            if (this.props.onTextChange && currentValue !== previousValue) {
                 this.props.onTextChange(maskResult.text, maskResult.complete);
             }
         }
