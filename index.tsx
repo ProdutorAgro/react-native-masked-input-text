@@ -22,7 +22,7 @@ export default class MaskedInput extends Component<IMaskedInputProps, IMaskedInp
 	public constructor(props: IMaskedInputProps) {
 		super(props);
 		this.onTextChange = this.onTextChange.bind(this);
-		this.state = {value: props.value};
+		this.state = {value: props.value || ""};
 		this.userInputProcessorFunction = createInputProcessor(props.mask);
 	}
 
@@ -32,7 +32,7 @@ export default class MaskedInput extends Component<IMaskedInputProps, IMaskedInp
 
 	public componentWillReceiveProps(nextProps: Readonly<IMaskedInputProps>, nextContext: any): void {
 		this.userInputProcessorFunction = createInputProcessor(nextProps.mask);
-		this.updateMaskedValue(nextProps.value);
+		this.updateMaskedValue(nextProps.value || "");
 	}
 
 	private updateMaskedValue(inputValue: string): void {
