@@ -1,6 +1,6 @@
 {
   "name": "react-native-masked-input-text",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "A typescript masked InputText for react-native",
   "main": "index.tsx",
   "repository": "git@github.com:ProdutorAgro/react-native-masked-input-text.git",
