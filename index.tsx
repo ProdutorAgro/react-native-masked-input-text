@@ -1,19 +1,14 @@
 import * as React from 'react';
 import { Component, ReactNode } from 'react';
-import { KeyboardTypeOptions, TextInput } from 'react-native';
+import { KeyboardTypeOptions, TextInput, TextInputProps } from 'react-native';
 import { createInputProcessor, InputProcessorFunction, UserInputType } from './internals/inputProcessor';
 
 type OnTextChangeListener = ((text: string, complete: boolean) => void);
 
-interface IMaskedInputProps {
+interface IMaskedInputProps extends TextInputProps {
 	mask: string;
-	placeholder: string;
-	style?: object;
 	value?: string;
-	keyboardType?: KeyboardTypeOptions;
 	onTextChange?: OnTextChangeListener;
-	placeholderTextColor?: string;
-	onSubmitEditing?: (() => void);
 }
 
 interface IMaskedInputState {
@@ -27,7 +22,7 @@ export default class MaskedInput extends Component<IMaskedInputProps, IMaskedInp
 	public constructor(props: IMaskedInputProps) {
 		super(props);
 		this.onTextChange = this.onTextChange.bind(this);
-		this.state = {value: props.value};
+		this.state = {value: props.value || ""};
 		this.userInputProcessorFunction = createInputProcessor(props.mask);
 	}
 
@@ -37,7 +32,7 @@ export default class MaskedInput extends Component<IMaskedInputProps, IMaskedInp
 
 	public componentWillReceiveProps(nextProps: Readonly<IMaskedInputProps>, nextContext: any): void {
 		this.userInputProcessorFunction = createInputProcessor(nextProps.mask);
-		this.updateMaskedValue(nextProps.value);
+		this.updateMaskedValue(nextProps.value || "");
 	}
 
 	private updateMaskedValue(inputValue: string): void {
@@ -52,15 +47,12 @@ export default class MaskedInput extends Component<IMaskedInputProps, IMaskedInp
 	}
 
 	public render(): ReactNode {
+                let { mask, value, onTextChange, ...attributes } = this.props;
 		return (
 			<TextInput
 				value={this.state.value}
-				placeholder={this.props.placeholder}
-				placeholderTextColor={this.props.placeholderTextColor}
 				onChangeText={(text) => this.onTextChange(text)}
-				style={this.props.style}
-				onSubmitEditing={this.props.onSubmitEditing}
-				keyboardType={this.props.keyboardType}/>
+                                {...attributes}/>
 		);
 	}
 }
