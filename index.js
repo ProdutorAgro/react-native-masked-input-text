@@ -207,7 +207,7 @@ define("internals/inputProcessor", ["require", "exports", "internals/maskTokeniz
             regexes
         };
         return (value, inputType) => {
-            let appliedMask;
+            let appliedMask = null;
             let numberTokensConsumed = 0;
             let lastIterationValue = '';
             for (let index = 0; index < value.length; index++) {
@@ -323,7 +323,7 @@ define("internals/inputProcessor", ["require", "exports", "internals/maskTokeniz
     }
     function currentCharMatchesRegex(currentChar, token) {
         const match = currentChar.match(token.regex);
-        return (match && match[0] === currentChar);
+        return (match != null && match[0] === currentChar);
     }
 });
 define("index", ["require", "exports", "react", "react", "react-native", "internals/inputProcessor"], function (require, exports, React, react_1, react_native_1, inputProcessor_1) {
