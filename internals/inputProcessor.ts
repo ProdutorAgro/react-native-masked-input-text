@@ -35,7 +35,7 @@ export function createInputProcessor(mask: string): InputProcessorFunction {
 	};
 
 	return (value: string, inputType: UserInputType): IMaskedTextResult => {
-		let appliedMask: IMaskResult;
+		let appliedMask: IMaskResult | null = null;
 		let numberTokensConsumed = 0;
 		let lastIterationValue = '';
 		for (let index = 0; index < value.length; index++) {
@@ -169,5 +169,5 @@ function canCurrentCharBeRemovedFromInput(currentChar: string, inputType: UserIn
 
 function currentCharMatchesRegex(currentChar: string, token: ITokenRegex): boolean {
 	const match = currentChar.match(token.regex);
-	return (match && match[0] === currentChar);
+	return (match != null && match[0] === currentChar);
 }
