@@ -9,13 +9,14 @@ interface IMaskedInputProps extends TextInputProps {
 	mask: string;
 	value?: string;
 	onTextChange?: OnTextChangeListener;
+	innerRef?: React.Ref<TextInput>
 }
 
 interface IMaskedInputState {
 	value: string;
 }
 
-export default class MaskedInput extends Component<IMaskedInputProps, IMaskedInputState> {
+class MaskedInput extends Component<IMaskedInputProps, IMaskedInputState> {
 
 	private userInputProcessorFunction: InputProcessorFunction;
 
@@ -47,12 +48,17 @@ export default class MaskedInput extends Component<IMaskedInputProps, IMaskedInp
 	}
 
 	public render(): ReactNode {
-                let { mask, value, onTextChange, ...attributes } = this.props;
+                let { mask, value, onTextChange, innerRef, ...attributes } = this.props;
 		return (
 			<TextInput
 				value={this.state.value}
+				ref={innerRef}
 				onChangeText={(text) => this.onTextChange(text)}
                                 {...attributes}/>
 		);
 	}
 }
+
+export default React.forwardRef<TextInput, IMaskedInputProps>(
+	(props, ref) => <MaskedInput innerRef={ref} {...props} />
+);
