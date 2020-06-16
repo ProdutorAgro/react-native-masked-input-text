@@ -353,10 +353,10 @@ define("index", ["require", "exports", "react", "react", "react-native", "intern
             }
         }
         render() {
-            let _a = this.props, { mask, value, onTextChange } = _a, attributes = __rest(_a, ["mask", "value", "onTextChange"]);
-            return (React.createElement(react_native_1.TextInput, Object.assign({ value: this.state.value, onChangeText: (text) => this.onTextChange(text) }, attributes)));
+            let _a = this.props, { mask, value, onTextChange, innerRef } = _a, attributes = __rest(_a, ["mask", "value", "onTextChange", "innerRef"]);
+            return (React.createElement(react_native_1.TextInput, Object.assign({ value: this.state.value, ref: innerRef, onChangeText: (text) => this.onTextChange(text) }, attributes)));
         }
     }
-    exports.default = MaskedInput;
+    exports.default = React.forwardRef((props, ref) => React.createElement(MaskedInput, Object.assign({ innerRef: ref }, props)));
 });
 //# sourceMappingURL=index.js.map
