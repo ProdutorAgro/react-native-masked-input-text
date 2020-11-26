@@ -144,16 +144,16 @@ function autofillNextChars(currentChar: string, inputType: UserInputType, tokens
 function canNextCharBeSkipped(currentChar: string, inputType: UserInputType, currentToken: ITokenRegex): boolean {
 	return (
 		inputType === UserInputType.INSERTION &&
-		currentToken.literal &&
-		currentToken.optional &&
-		!currentCharMatchesRegex(currentChar, currentToken)
+		currentToken && currentToken.literal &&
+		(currentToken.optional ||
+		!currentCharMatchesRegex(currentChar, currentToken))
 	);
 }
 
 function canNextCharBeAutoCompleted(currentChar: string, inputType: UserInputType, currentToken: ITokenRegex): boolean {
 	return (
 		inputType === UserInputType.INSERTION &&
-		currentToken.literal &&
+		currentToken && currentToken.literal &&
 		!currentToken.optional &&
 		!currentCharMatchesRegex(currentChar, currentToken)
 	);
@@ -162,12 +162,12 @@ function canNextCharBeAutoCompleted(currentChar: string, inputType: UserInputTyp
 function canCurrentCharBeRemovedFromInput(currentChar: string, inputType: UserInputType, currentToken: ITokenRegex): boolean {
 	return (
 		inputType === UserInputType.INSERTION &&
-		!currentToken.literal &&
+		currentToken && !currentToken.literal &&
 		!currentCharMatchesRegex(currentChar, currentToken)
 	);
 }
 
 function currentCharMatchesRegex(currentChar: string, token: ITokenRegex): boolean {
-	const match = currentChar.match(token.regex);
-	return (match != null && match[0] === currentChar);
+	const match = token && currentChar.match(token.regex);
+	return (match != null && (match[0] === currentChar || (!match[0] && token.optional)));
 }

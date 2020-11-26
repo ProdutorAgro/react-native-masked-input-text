@@ -144,13 +144,17 @@ test('When providing complete value to the mask it should return complete as tru
 });
 
 test('When providing complete value to the mask containing optional tokens in the end it should return complete as true', () => {
-	const inputProcessor = createInputProcessor('+595 00 00000000?');
-	const inputValues = ['+595 00 0000000'];
+	const inputProcessor = createInputProcessor('00?0?.00?0?.00?0?.00?0?');
+	const inputValues = ['255.255.255.255', '127.0.0.1'];
 	const outputResults = enterValuesOneAtTime(inputValues, inputProcessor);
 
 	expect(outputResults).toEqual([
 		{
-			text: '+595 00 0000000',
+			text: '255.255.255.255',
+			complete: true
+		},
+		{
+			text: '127.0.0.1',
 			complete: true
 		}
 	]);
