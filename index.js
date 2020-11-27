@@ -306,24 +306,24 @@ define("internals/inputProcessor", ["require", "exports", "internals/maskTokeniz
     }
     function canNextCharBeSkipped(currentChar, inputType, currentToken) {
         return (inputType === UserInputType.INSERTION &&
-            currentToken.literal &&
-            currentToken.optional &&
-            !currentCharMatchesRegex(currentChar, currentToken));
+            currentToken && currentToken.literal &&
+            (currentToken.optional ||
+                !currentCharMatchesRegex(currentChar, currentToken)));
     }
     function canNextCharBeAutoCompleted(currentChar, inputType, currentToken) {
         return (inputType === UserInputType.INSERTION &&
-            currentToken.literal &&
+            currentToken && currentToken.literal &&
             !currentToken.optional &&
             !currentCharMatchesRegex(currentChar, currentToken));
     }
     function canCurrentCharBeRemovedFromInput(currentChar, inputType, currentToken) {
         return (inputType === UserInputType.INSERTION &&
-            !currentToken.literal &&
+            currentToken && !currentToken.literal &&
             !currentCharMatchesRegex(currentChar, currentToken));
     }
     function currentCharMatchesRegex(currentChar, token) {
-        const match = currentChar.match(token.regex);
-        return (match != null && match[0] === currentChar);
+        const match = token && currentChar.match(token.regex);
+        return match != null && (match[0] === currentChar || (!match[0] && token.optional));
     }
 });
 define("index", ["require", "exports", "react", "react", "react-native", "internals/inputProcessor"], function (require, exports, React, react_1, react_native_1, inputProcessor_1) {
