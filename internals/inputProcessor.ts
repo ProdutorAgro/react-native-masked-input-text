@@ -146,7 +146,7 @@ function canNextCharBeSkipped(currentChar: string, inputType: UserInputType, cur
 		inputType === UserInputType.INSERTION &&
 		currentToken && currentToken.literal &&
 		(currentToken.optional ||
-		!currentCharMatchesRegex(currentChar, currentToken))
+			!currentCharMatchesRegex(currentChar, currentToken))
 	);
 }
 
@@ -169,5 +169,5 @@ function canCurrentCharBeRemovedFromInput(currentChar: string, inputType: UserIn
 
 function currentCharMatchesRegex(currentChar: string, token: ITokenRegex): boolean {
 	const match = token && currentChar.match(token.regex);
-	return (match != null && (match[0] === currentChar || (!match[0] && token.optional)));
+	return match != null && (match[0] === currentChar || (!match[0] && token.optional));
 }

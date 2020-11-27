@@ -144,21 +144,49 @@ test('When providing complete value to the mask it should return complete as tru
 });
 
 test('When providing complete value to the mask containing optional tokens in the end it should return complete as true', () => {
-	const inputProcessor = createInputProcessor('00?0?.00?0?.00?0?.00?0?');
-	const inputValues = ['255.255.255.255', '127.0.0.1'];
+	const inputProcessor = createInputProcessor('+595 00 00000000?');
+	const inputValues = ['+595 00 0000000'];
 	const outputResults = enterValuesOneAtTime(inputValues, inputProcessor);
 
 	expect(outputResults).toEqual([
 		{
-			text: '255.255.255.255',
-			complete: true
-		},
-		{
-			text: '127.0.0.1',
+			text: '+595 00 0000000',
 			complete: true
 		}
 	]);
 });
+
+test('IP format', () => {
+	const inputProcessor = createInputProcessor('00?0?.00?0?.00?0?.00?0?');
+	const inputValues = ['127.0.0.100'];
+	const outputResults = enterValuesOneAtTime(inputValues, inputProcessor);
+
+	expect(outputResults).toEqual([
+		{
+			text: '127.0.0.100',
+			complete: true
+		}
+	]);
+});
+
+/* TODO
+test('Korean car number format', () => {
+	const inputProcessor = createInputProcessor('s?s? 00?0? s 0000');
+	const inputValues = ['AB 01 X 1234', '01 X 1234'];
+	const outputResults = enterValuesOneAtTime(inputValues, inputProcessor);
+
+	expect(outputResults).toEqual([
+		{
+			text: 'AB 01 X 1234',
+			complete: true
+		},
+		{
+			text: '01 X 1234',
+			complete: true
+		},
+	]);
+});
+*/
 
 function maskedResultToText(results: IMaskedTextResult[]): string[] {
 	return results.map((result) => result.text);

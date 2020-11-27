@@ -323,7 +323,7 @@ define("internals/inputProcessor", ["require", "exports", "internals/maskTokeniz
     }
     function currentCharMatchesRegex(currentChar, token) {
         const match = token && currentChar.match(token.regex);
-        return (match != null && (match[0] === currentChar || (!match[0] && token.optional)));
+        return match != null && (match[0] === currentChar || (!match[0] && token.optional));
     }
 });
 define("index", ["require", "exports", "react", "react", "react-native", "internals/inputProcessor"], function (require, exports, React, react_1, react_native_1, inputProcessor_1) {
