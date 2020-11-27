@@ -30,9 +30,11 @@ export default class MaskedInput extends Component<IMaskedInputProps, IMaskedInp
 		this.updateMaskedValue(text);
 	}
 
-	public componentWillReceiveProps(nextProps: Readonly<IMaskedInputProps>, nextContext: any): void {
-		this.userInputProcessorFunction = createInputProcessor(nextProps.mask);
-		this.updateMaskedValue(nextProps.value || "");
+	public componentDidUpdate(prevProps: Readonly<IMaskedInputProps>, prevState: Readonly<IMaskedInputState>, snapshot?: any) {
+	  if (prevProps.mask !== this.props.mask) {
+			this.userInputProcessorFunction = createInputProcessor(this.props.mask);
+		}
+		this.updateMaskedValue(this.props.value || "");
 	}
 
 	private updateMaskedValue(inputValue: string): void {
@@ -40,14 +42,14 @@ export default class MaskedInput extends Component<IMaskedInputProps, IMaskedInp
 		const previousValue = this.state.value;
 		const currentValue = maskResult.text;
 
-		this.setState({ value: currentValue });
 		if (this.props.onTextChange && currentValue !== previousValue) {
+			this.setState({ value: currentValue });
 			this.props.onTextChange(maskResult.text, maskResult.complete);
 		}
 	}
 
 	public render(): ReactNode {
-                let { mask, value, onTextChange, ...attributes } = this.props;
+		let { mask, value, onTextChange, ...attributes } = this.props;
 		return (
 			<TextInput
 				value={this.state.value}
